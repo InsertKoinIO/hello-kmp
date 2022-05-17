@@ -1,7 +1,8 @@
 package com.example.helloworldkmp
 
-class Greeting {
+class Greeting(private val platform: Platform) {
+
     fun greeting(): String {
-        return "Hello, ${Platform().platform}!"
+        return "Hello, ${platform.name}!"
     }
 }

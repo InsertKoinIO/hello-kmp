@@ -23,7 +23,14 @@ kotlin {
     }
     
     sourceSets {
-        val commonMain by getting
+        val commonMain by getting {
+            dependencies {
+                with(Deps.Koin) {
+                    api(core)
+                    api(test)
+                }
+            }
+        }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
