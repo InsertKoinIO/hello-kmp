@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform")
+    id("com.google.devtools.ksp")
     kotlin("native.cocoapods")
     id("com.android.library")
 }
@@ -28,15 +29,19 @@ kotlin {
                 with(Deps.Koin) {
                     api(core)
                     api(test)
+                    api(annotations)
                 }
             }
+            kotlin.srcDir("build/generated/ksp/android/androidDebug/kotlin")
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }
         }
-        val androidMain by getting
+        val androidMain by getting {
+            dependsOn(commonMain)
+        }
         val androidTest by getting
         val iosX64Main by getting
         val iosArm64Main by getting
@@ -66,4 +71,11 @@ android {
         minSdk = 21
         targetSdk = 32
     }
+}
+
+dependencies {
+    add("kspCommonMainMetadata",Deps.Koin.kspCompiler)
+    add("kspAndroid",Deps.Koin.kspCompiler)
+    add("kspIosX64",Deps.Koin.kspCompiler)
+    add("kspIosSimulatorArm64",Deps.Koin.kspCompiler)
 }

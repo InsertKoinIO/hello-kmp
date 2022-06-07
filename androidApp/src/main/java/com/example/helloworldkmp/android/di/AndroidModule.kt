@@ -1,10 +1,8 @@
 package com.example.helloworldkmp.android.di
 
-import com.example.helloworldkmp.android.GreetPresenter
-import org.koin.core.module.dsl.singleOf
-import org.koin.dsl.module
+import org.koin.core.annotation.ComponentScan
+import org.koin.core.annotation.Module
 
-
-val androidModule = module {
-    singleOf(::GreetPresenter)
-}
+@Module
+@ComponentScan("com.example.helloworldkmp.android")
+class AndroidModule

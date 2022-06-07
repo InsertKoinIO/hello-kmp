@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     kotlin("android")
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -17,6 +18,15 @@ android {
             isMinifyEnabled = false
         }
     }
+
+    applicationVariants.all {
+        val variantName = name
+        sourceSets {
+            getByName("main") {
+                java.srcDir(File("build/generated/ksp/$variantName/kotlin"))
+            }
+        }
+    }
 }
 
 dependencies {
@@ -28,5 +38,7 @@ dependencies {
     with(Deps.Koin) {
         implementation(core)
         implementation(android)
+        implementation(annotations)
+        ksp(kspCompiler)
     }
 }
