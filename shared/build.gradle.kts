@@ -32,7 +32,6 @@ kotlin {
                     api(annotations)
                 }
             }
-            kotlin.srcDir("build/generated/ksp/android/androidDebug/kotlin")
         }
         val commonTest by getting {
             dependencies {
