@@ -1,14 +1,20 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+
 plugins {
     kotlin("multiplatform")
     id("com.google.devtools.ksp")
     kotlin("native.cocoapods")
     id("com.android.library")
+    id("maven-publish")
 }
 
 version = "1.0"
 
 kotlin {
-    android()
+    jvmToolchain(11)
+    targetHierarchy.default()
+
+    androidTarget()
     iosX64()
     iosArm64()
     iosSimulatorArm64()
@@ -22,9 +28,10 @@ kotlin {
             baseName = "shared"
         }
     }
-    
+
     sourceSets {
         val commonMain by getting {
+            kotlin.srcDir("build/generated/ksp/metadata/commonMain/kotlin")
             dependencies {
                 with(Deps.Koin) {
                     api(core)
@@ -38,43 +45,43 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
-        val androidMain by getting {
-            dependsOn(commonMain)
-        }
-        val androidTest by getting
-        val iosX64Main by getting
-        val iosArm64Main by getting
-        val iosSimulatorArm64Main by getting
-        val iosMain by creating {
-            dependsOn(commonMain)
-            iosX64Main.dependsOn(this)
-            iosArm64Main.dependsOn(this)
-            iosSimulatorArm64Main.dependsOn(this)
-        }
-        val iosX64Test by getting
-        val iosArm64Test by getting
-        val iosSimulatorArm64Test by getting
-        val iosTest by creating {
-            dependsOn(commonTest)
-            iosX64Test.dependsOn(this)
-            iosArm64Test.dependsOn(this)
-            iosSimulatorArm64Test.dependsOn(this)
-        }
+        val androidMain by getting
+        val androidUnitTest by getting
+        val iosMain by getting
+        val iosTest by getting
     }
 }
 
 android {
-    compileSdk = 32
+    compileSdk = 33
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = 21
-        targetSdk = 32
+        targetSdk = 33
     }
+    namespace = "com.example.helloworldkmp"
 }
 
 dependencies {
-    add("kspCommonMainMetadata",Deps.Koin.kspCompiler)
-    add("kspAndroid",Deps.Koin.kspCompiler)
-    add("kspIosX64",Deps.Koin.kspCompiler)
-    add("kspIosSimulatorArm64",Deps.Koin.kspCompiler)
+    add("kspCommonMainMetadata", Deps.Koin.kspCompiler)
+    // DO NOT add bellow dependencies
+//    add("kspAndroid", Deps.Koin.kspCompiler)
+//    add("kspIosX64", Deps.Koin.kspCompiler)
+//    add("kspIosArm64", Deps.Koin.kspCompiler)
+//    add("kspIosSimulatorArm64", Deps.Koin.kspCompiler)
+}
+
+// WORKAROUND: ADD this dependsOn("kspCommonMainKotlinMetadata") instead of above dependencies
+tasks.withType<KotlinCompile<*>>().configureEach {
+    if (name != "kspCommonMainKotlinMetadata") {
+        dependsOn("kspCommonMainKotlinMetadata")
+    }
+}
+afterEvaluate {
+    tasks.filter {
+        it.name.contains("SourcesJar", true)
+    }?.forEach {
+        println("SourceJarTask====>${it.name}")
+        it.dependsOn("kspCommonMainKotlinMetadata")
+    }
 }

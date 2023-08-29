@@ -1,7 +1,7 @@
 
 object Versions {
-    const val koin = "3.2.1"
-    const val koinAnnotations = "1.0.2"
+    const val koin = "3.4.3"
+    const val koinAnnotations = "1.2.2"
 }
 
 object Deps {
